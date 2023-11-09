@@ -1013,8 +1013,8 @@ int test_scheduler_accuracy(env_t env)
     set_helper_sched_params(env, &helper, period, period, 0);
     start_helper(env, &helper, (helper_fn_t) sched0011_helper, 0, 0, 0, 0);
     set_helper_priority(env, &helper, OUR_PRIO);
-    seL4_Yield();
     for (int i = 0; i < 11; i++) {
+        seL4_Yield();
         uint64_t start = sel4test_timestamp(env);
         seL4_Yield();
         uint64_t end = sel4test_timestamp(env);
