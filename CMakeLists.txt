@@ -6,9 +6,13 @@
 
 cmake_minimum_required(VERSION 3.7.2)
 
-if(NOT SEL4TEST_DONT_USE_SETTINGS_CMAKE)
-    # use settings from the standard sel4test build
-    include(settings.cmake)
+# By default, settings.cmake is used. This can be customized:
+# - use custom settings:      cmake ... -D SEL4TEST_SETTINGS_CMAKE=my-settings.cmake
+# - use no settings at all:   cmake ... -D SEL4TEST_SETTINGS_CMAKE
+if(NOT DEFINED SEL4TEST_SETTINGS_CMAKE)
+    include("settings.cmake")
+elseif(SEL4TEST_SETTINGS_CMAKE)
+    include("${SEL4TEST_SETTINGS_CMAKE}")
 endif()
 
 project(sel4test C CXX ASM)
