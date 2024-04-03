@@ -6,22 +6,9 @@
 
 cmake_minimum_required(VERSION 3.7.2)
 
-set(sel4_repos "/home/codasip.com/axel.heider/data/repos/github/seL4")
-
 set(project_dir "${CMAKE_CURRENT_LIST_DIR}/../..")
-file(GLOB project_modules ${project_dir}/projects/*)
-list(
-    APPEND
-        CMAKE_MODULE_PATH
-        ${sel4_repos}/seL4
-        ${sel4_repos}/seL4_tools/cmake-tool/helpers/
-        ${sel4_repos}/seL4_tools/elfloader-tool/
-        ${sel4_repos}/musllibc
-        ${sel4_repos}/seL4_libs
-        ${sel4_repos}/sel4_projects_libs
-        ${sel4_repos}/sel4runtime
-        ${sel4_repos}/util_libs
-)
+
+# ... removed appending to CMAKE_MODULE_PATH ...
 
 set(NANOPB_SRC_ROOT_FOLDER "${project_dir}/tools/nanopb" CACHE STRING "NanoPB Folder location")
 set(OPENSBI_PATH "${project_dir}/tools/opensbi" CACHE STRING "OpenSBI Folder location")
