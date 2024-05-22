@@ -224,6 +224,7 @@ void sel4test_start_test(const char *name, int n)
     if (config_set(CONFIG_PRINT_XML)) {
         printf("\t<testcase classname=\"%s\" name=\"%s\">\n", "sel4test", name);
     } else {
+        printf("--------------------------------------------------\n");
         printf("Starting test %d: %s\n", n, name);
     }
     sel4test_reset();
@@ -237,6 +238,8 @@ void sel4test_end_test(test_result_t result)
 
     if (config_set(CONFIG_PRINT_XML)) {
         printf("\t</testcase>\n");
+    } else {
+        printf("Finished test: %s\n", result == SUCCESS ? "passed" : "failed");
     }
 
     if (config_set(CONFIG_HAVE_TIMER)) {
