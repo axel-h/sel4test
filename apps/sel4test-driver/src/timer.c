@@ -83,6 +83,7 @@ void timeout(driver_env_t env, uint64_t ns, timeout_type_t timeout_type)
         int error = tm_register_cb(&env->tm, timeout_type, ns, 0,
                                    TIMER_ID, timeout_cb, env->timer_notify_test.cptr);
         if (error == ETIME) {
+            ZF_LOGI("tm_register_cb() failed with ETIME, invoking callback directly");
             error = timeout_cb(env->timer_notify_test.cptr);
         } else {
             timeServer_timeoutPending = true;
