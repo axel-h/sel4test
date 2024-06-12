@@ -180,11 +180,30 @@ static void init_timer(void)
         error = ltimer_default_init(&env.ltimer, env.ops, NULL, NULL);
         ZF_LOGF_IF(error, "Failed to setup the timers");
 
+        /* ensure there are no pending timer interrupts */
+        seL4_CPtr timer_intr_cptr = env.timer_notification.cptr;
+        seL4_Word badge = 0;
+        seL4_Poll(timer_intr_cptr, &badge);
+        if (badge) {
+            handle_timer_interrupts(&env, badge);
+            ZF_LOGD("cleaned pending timer interrupt left over from setup");
+            /* Having one pending timer interrupt is fine here. It might be a
+             * left over from the ltimer setup, because it can clean the
+             * interrupts. Getting another interrupt afterwards indicates
+             * something is wrong with the timer setup, as the timer should not
+             * be active.
+             */
+            badge = 0;
+            seL4_Poll(timer_intr_cptr, &badge);
+            ZF_LOGF_IF(badge, "Timer interrupt still pending")
+        }
+
         error = vka_alloc_notification(&env.vka, &env.timer_notify_test);
         ZF_LOGF_IF(error, "Failed to allocate notification object for tests");
 
-        error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple), env.timer_notification.cptr);
-        ZF_LOGF_IF(error, "Failed to bind timer notification to sel4test-driver\n");
+        error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple),
+                                          timer_intr_cptr);
+        ZF_LOGF_IF(error, "Failed to bind timer notification to sel4test-driver");
 
         /* set up the timer manager */
         tm_init(&env.tm, &env.ltimer, &env.ops, 1);
@@ -323,7 +342,7 @@ void sel4test_run_tests(struct driver_env *e)
     /* Extract and filter the tests based on the regex */
     regex_t reg;
     int error = regcomp(&reg, CONFIG_TESTPRINTER_REGEX, REG_EXTENDED | REG_NOSUB);
-    ZF_LOGF_IF(error, "Error compiling regex \"%s\"\n", CONFIG_TESTPRINTER_REGEX);
+    ZF_LOGF_IF(error, "Error compiling regex \"%s\"", CONFIG_TESTPRINTER_REGEX);
 
     int skipped_tests = 0;
     /* get all the tests in the test case section in the driver */
