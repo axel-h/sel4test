@@ -45,9 +45,11 @@ int test_timer(driver_env_t env)
 
     while (!test_finished) {
         wait_for_timer_interrupt(env);
-        ZF_LOGV("Tick");
-        error = tm_update(&env->tm);  /* invokes test_callback() */
+        uint64_t now_ns = timestamp(env);
+        error = tm_update(&env->tm); /* invokes test_callback() */
         test_assert_fatal(!error);
+        /* printing is uncritical with a 1 second tick */
+        ZF_LOGD("Tick, timestamp %"PRIu64".%09"PRIu64" sec", now_ns / NS_IN_S, now_ns % NS_IN_S);
     }
 
     error = tm_free_id(&env->tm, TIMER_ID);
