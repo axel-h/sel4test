@@ -46,7 +46,7 @@ int test_timer(driver_env_t env)
     while (!test_finished) {
         wait_for_timer_interrupt(env);
         ZF_LOGV("Tick");
-        error = tm_update(&env->tm);
+        error = tm_update(&env->tm);  /* invokes test_callback() */
         test_assert_fatal(!error);
     }
 
@@ -79,7 +79,7 @@ test_gettime_timeout(driver_env_t env)
     while (!test_finished) {
         wait_for_timer_interrupt(env);
         ZF_LOGV("Tick");
-        error = tm_update(&env->tm);
+        error = tm_update(&env->tm); /* invokes test_callback() */
         test_assert_fatal(!error);
     }
 
