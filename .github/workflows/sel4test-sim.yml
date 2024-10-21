@@ -21,15 +21,70 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  simulation:
-    name: Simulation
+
+  the_matrix:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        march: [armv7a, armv8a, nehalem, rv32imac, rv64imac]
-        compiler: [gcc, clang]
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
-    - uses: seL4/ci-actions/sel4test-sim@master
-      with:
-        march: ${{ matrix.march }}
-        compiler: ${{ matrix.compiler }}
+    - id: matrix
+      uses: seL4/ci-actions/sel4test-hw-matrix@master
+    - env:
+        json_steps_matrix: ${{ toJSON(steps.matrix) }}
+        json_steps_matrix_outputs_matrix: ${{ toJSON(steps.matrix.outputs.matrix) }}
+      run: |
+        echo steps.matrix = ${json_steps_matrix}
+        echo steps.matrix.outputs.matrix = ${json_steps_matrix_outputs_matrix}
+
+# steps.matrix.outputs.matrix = {
+#     "include": [
+#         {"platform": "ODROID_C4", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "ODROID_C4", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "ZYNQMP106", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "ZYNQMP106", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "ZYNQMP", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "ZYNQMP", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "TK1", "march": "armv7a", "compiler": "gcc"},
+#         {"platform": "TK1", "march": "armv7a", "compiler": "clang"},
+#         {"platform": "TX1", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "TX1", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "TX2", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "TX2", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "PC99", "march": "nehalem", "compiler": "gcc", "mode": 32},
+#         {"platform": "PC99", "march": "nehalem", "compiler": "clang", "mode": 32},
+#         {"platform": "PC99", "march": "nehalem", "compiler": "gcc", "mode": 64},
+#         {"platform": "PC99", "march": "nehalem", "compiler": "clang", "mode": 64},
+#         {"platform": "ODROID_XU4", "march": "armv7a", "compiler": "gcc"},
+#         {"platform": "ODROID_XU4", "march": "armv7a", "compiler": "clang"},
+#         {"platform": "IMX8MQ_EVK", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "IMX8MQ_EVK", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "HIFIVE", "march": "rv64imac", "compiler": "gcc"},
+#         {"platform": "HIFIVE", "march": "rv64imac", "compiler": "clang"},
+#         {"platform": "SABRE", "march": "armv7a", "compiler": "gcc"},
+#         {"platform": "SABRE", "march": "armv7a", "compiler": "clang"},
+#         {"platform": "IMX8MM_EVK", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "IMX8MM_EVK", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "TQMA8XQP1GB", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "TQMA8XQP1GB", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "OMAP3", "march": "armv7a", "compiler": "gcc"},
+#         {"platform": "OMAP3", "march": "armv7a", "compiler": "clang"},
+#         {"platform": "ODROID_C2", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "ODROID_C2", "march": "armv8a", "compiler": "clang"},
+#         {"platform": "AM335X_BONEBLACK", "march": "armv8a", "compiler": "gcc"},
+#         {"platform": "AM335X_BONEBLACK", "march": "armv8a", "compiler": "clang"}
+#     ]
+# }
+
+
+#  simulation:
+#    name: Simulation
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        march: [armv7a, armv8a, nehalem, rv32imac, rv64imac]
+#        compiler: [gcc, clang]
+#    steps:
+#    - uses: seL4/ci-actions/sel4test-sim@master
+#      with:
+#        march: ${{ matrix.march }}
+#        compiler: ${{ matrix.compiler }}
